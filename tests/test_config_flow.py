@@ -957,6 +957,7 @@ async def test_user_config_flow_over_climate_auto_start_stop(
         result["flow_id"],
         user_input={
             CONF_AUTO_START_STOP_LEVEL: AUTO_START_STOP_LEVEL_MEDIUM,
+            CONF_AUTO_START_STOP_TEMP_HYSTERERIS: CONF_AUTO_START_STOP_TEMP_HYSTERERIS_DEFAULT,
         },
     )
     assert result["type"] == FlowResultType.MENU
@@ -1118,6 +1119,7 @@ async def test_user_config_flow_over_climate_auto_start_stop(
         CONF_USED_BY_CENTRAL_BOILER: False,
         CONF_USE_AUTO_START_STOP_FEATURE: True,
         CONF_AUTO_START_STOP_LEVEL: AUTO_START_STOP_LEVEL_MEDIUM,
+        CONF_AUTO_START_STOP_TEMP_HYSTERERIS: CONF_AUTO_START_STOP_TEMP_HYSTERERIS_DEFAULT,
     }
     assert result["result"]
     assert result["result"].domain == DOMAIN

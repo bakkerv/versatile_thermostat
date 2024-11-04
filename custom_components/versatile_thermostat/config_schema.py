@@ -194,7 +194,7 @@ STEP_AUTO_START_STOP = vol.Schema(  # pylint: disable=invalid-name
                 mode="dropdown",
             )
         ),
-        vol.Optional(CONF_AUTO_START_STOP_TEMP_HYSTERERIS, default=CONF_AUTO_START_STOP_TEMP_HYSTERERIS): cv.Coerce(float),
+        vol.Optional(CONF_AUTO_START_STOP_TEMP_HYSTERERIS, default=CONF_AUTO_START_STOP_TEMP_HYSTERERIS): vol.Coerce(float),
     }
 )
 
