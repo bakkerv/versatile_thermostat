@@ -144,7 +144,7 @@ class ThermostatOverClimate(BaseThermostat[UnderlyingClimate]):
 
         # Instanciate the auto start stop algo
         self._auto_start_stop_algo = AutoStartStopDetectionAlgorithm(
-            self._auto_start_stop_level, self.name
+            self._auto_start_stop_level, self.name, config_entry.get(CONF_AUTO_START_STOP_TEMP_HYSTERERIS, CONF_AUTO_START_STOP_TEMP_HYSTERERIS_DEFAULT)
         )
 
     @property

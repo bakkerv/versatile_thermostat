@@ -14,6 +14,7 @@ from .const import (
     AUTO_START_STOP_LEVEL_MEDIUM,
     AUTO_START_STOP_LEVEL_SLOW,
     TYPE_AUTO_START_STOP_LEVELS,
+    CONF_AUTO_START_STOP_TEMP_HYSTERERIS_DEFAULT
 )
 
 
@@ -29,9 +30,6 @@ DT_MIN = {
 
 # the measurement cycle (2 min)
 CYCLE_SEC = 120
-
-# A temp hysteresis to avoid rapid OFF/ON
-TEMP_HYSTERESIS = 0.5
 
 ERROR_THRESHOLD = {
     AUTO_START_STOP_LEVEL_NONE: 0,  # Not used
@@ -58,10 +56,11 @@ class AutoStartStopDetectionAlgorithm:
     _error_threshold: float | None = None
     _last_calculation_date: datetime | None = None
 
-    def __init__(self, level: TYPE_AUTO_START_STOP_LEVELS, vtherm_name) -> None:
+    def __init__(self, level: TYPE_AUTO_START_STOP_LEVELS, vtherm_name, temp_hysteresis = CONF_AUTO_START_STOP_TEMP_HYSTERERIS_DEFAULT) -> None:
         """Initalize a new algorithm with the right constants"""
         self._vtherm_name = vtherm_name
         self._init_level(level)
+        self._temp_hysteresis = temp_hysteresis
 
     def _init_level(self, level: TYPE_AUTO_START_STOP_LEVELS):
         """Initialize a new level"""
@@ -148,7 +147,7 @@ class AutoStartStopDetectionAlgorithm:
         if hvac_mode == HVACMode.HEAT:
             if (
                 self._accumulated_error <= -self._error_threshold
-                and temp_at_dt >= target_temp + TEMP_HYSTERESIS
+                and temp_at_dt >= target_temp + self.temp_hysteresis
             ):
                 _LOGGER.info(
                     "%s - We need to stop, there is no need for heating for a long time.",
@@ -162,7 +161,7 @@ class AutoStartStopDetectionAlgorithm:
         if hvac_mode == HVACMode.COOL:
             if (
                 self._accumulated_error >= self._error_threshold
-                and temp_at_dt <= target_temp - TEMP_HYSTERESIS
+                and temp_at_dt <= target_temp - self.temp_hysteresis
             ):
                 _LOGGER.info(
                     "%s - We need to stop, there is no need for cooling for a long time.",
@@ -178,7 +177,7 @@ class AutoStartStopDetectionAlgorithm:
 
         # check to turn on
         if hvac_mode == HVACMode.OFF and saved_hvac_mode == HVACMode.HEAT:
-            if temp_at_dt <= target_temp - TEMP_HYSTERESIS:
+            if temp_at_dt <= target_temp - self.temp_hysteresis:
                 _LOGGER.info(
                     "%s - We need to start, because it will be time to heat",
                     self,
@@ -192,7 +191,7 @@ class AutoStartStopDetectionAlgorithm:
                 return AUTO_START_STOP_ACTION_NOTHING
 
         if hvac_mode == HVACMode.OFF and saved_hvac_mode == HVACMode.COOL:
-            if temp_at_dt >= target_temp + TEMP_HYSTERESIS:
+            if temp_at_dt >= target_temp + self.temp_hysteresis:
                 _LOGGER.info(
                     "%s - We need to start, because it will be time to cool",
                     self,
@@ -234,6 +233,11 @@ class AutoStartStopDetectionAlgorithm:
     def level(self) -> TYPE_AUTO_START_STOP_LEVELS:
         """Get the level value"""
         return self._level
+    
+    @property
+    def temp_hysteresis(self) -> float:
+        """Get the temperature delta allowed for hysteris"""
+        return self._temp_hysteresis
 
     def __str__(self) -> str:
         return f"AutoStartStopDetectionAlgorithm-{self._vtherm_name}"

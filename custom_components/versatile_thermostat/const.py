@@ -162,6 +162,9 @@ CONF_AUTO_START_STOP_LEVELS = [
     AUTO_START_STOP_LEVEL_MEDIUM,
     AUTO_START_STOP_LEVEL_FAST,
 ]
+CONF_AUTO_START_STOP_TEMP_HYSTERERIS = "auto_start_stop_temp_hysteresis"
+CONF_AUTO_START_STOP_TEMP_HYSTERERIS_DEFAULT = 0.5
+
 
 # For explicit typing purpose only
 TYPE_AUTO_START_STOP_LEVELS = Literal[  # pylint: disable=invalid-name
